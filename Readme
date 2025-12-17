@@ -1,0 +1,34 @@
+# GoChatX
+
+**GoChatX** is an advanced real-time chat application built with **Go (Golang)** for the backend using **WebSockets**, and **React** for the frontend. It supports multiple users, instant messaging, usernames, join/leave notifications, timestamps, and demonstrates concurrency using goroutines and channels.  
+
+This project is **internship-ready** and showcases backend skills, WebSocket communication, and full-stack development.
+
+---
+
+## Features
+
+- Real-time messaging using **WebSockets**
+- Multiple users can chat simultaneously
+- **Usernames** for each participant
+- **Join/Leave notifications**
+- **Timestamps** for messages
+- Built with **Goroutines & Channels** for concurrency
+- Clean, modular **Go backend**
+- Responsive **React frontend**
+- Production-ready project structure
+
+---
+
+## Tech Stack
+
+- **Backend:** Go (Gorilla WebSocket)
+- **Frontend:** React.js
+- **Concurrency:** Goroutines & Channels
+- **Communication:** WebSockets
+- **Deployment:** Runs locally or on a server
+
+---
+
+## Project Structure
+
