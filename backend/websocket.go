@@ -1,36 +1,29 @@
 package main
 
 import (
+	"log"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
 
 var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool { return true },
-}
-
-func now() string {
-	return time.Now().Format("15:04:05")
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
 func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
-	username := r.URL.Query().Get("username")
-	if username == "" {
-		username = "Anonymous"
-	}
-
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
+		log.Println("Upgrade error:", err)
 		return
 	}
 
 	client := &Client{
-		hub:      hub,
-		conn:     conn,
-		send:     make(chan Message),
-		username: username,
+		hub:  hub,
+		conn: &Connection{conn},
+		send: make(chan Message),
 	}
 
 	hub.register <- client

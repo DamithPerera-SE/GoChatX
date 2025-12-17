@@ -1,46 +1,25 @@
 package main
 
-import (
-	"encoding/json"
-	"log"
-
-	"github.com/gorilla/websocket"
-)
-
-type Client struct {
-	hub      *Hub
-	conn     *websocket.Conn
-	send     chan Message
-	username string
-}
-
 func (c *Client) readPump() {
 	defer func() {
 		c.hub.unregister <- c
-		c.conn.Close()
+		c.conn.ws.Close()
 	}()
 
 	for {
-		_, msg, err := c.conn.ReadMessage()
-		if err != nil {
-			log.Println("read error:", err)
+		var msg Message
+		if err := c.conn.ReadJSON(&msg); err != nil {
 			break
 		}
-
-		var message Message
-		json.Unmarshal(msg, &message)
-		message.Username = c.username
-		message.Timestamp = now()
-
-		c.hub.broadcast <- message
+		c.hub.broadcast <- msg
 	}
 }
 
 func (c *Client) writePump() {
-	defer c.conn.Close()
-
-	for message := range c.send {
-		data, _ := json.Marshal(message)
-		c.conn.WriteMessage(websocket.TextMessage, data)
+	defer c.conn.ws.Close()
+	for msg := range c.send {
+		if err := c.conn.WriteJSON(msg); err != nil {
+			break
+		}
 	}
 }

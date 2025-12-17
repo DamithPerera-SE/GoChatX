@@ -19,29 +19,21 @@ func newHub() *Hub {
 func (h *Hub) run() {
 	for {
 		select {
-
 		case client := <-h.register:
 			h.clients[client] = true
-			h.broadcast <- Message{
-				Username:  "SYSTEM",
-				Content:   client.username + " joined the chat",
-				Timestamp: now(),
-			}
-
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
-				h.broadcast <- Message{
-					Username:  "SYSTEM",
-					Content:   client.username + " left the chat",
-					Timestamp: now(),
-				}
 			}
-
 		case message := <-h.broadcast:
 			for client := range h.clients {
-				client.send <- message
+				select {
+				case client.send <- message:
+				default:
+					close(client.send)
+					delete(h.clients, client)
+				}
 			}
 		}
 	}
